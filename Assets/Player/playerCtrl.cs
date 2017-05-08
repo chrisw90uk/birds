@@ -7,6 +7,9 @@ public class playerCtrl : MonoBehaviour {
     private float speed;
     private bool facingRight;
     public Rigidbody2D body;
+    public bool isGrounded;
+    public float distToGround;
+    
 
 
 	// Use this for initialization
@@ -15,16 +18,38 @@ public class playerCtrl : MonoBehaviour {
         transform.position = new Vector2(0, 0);
         body = GetComponent<Rigidbody2D>();
         facingRight = true;
+        isGrounded = true;
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    //ground check
+
+    private void OnCollisionEnter2D(Collision2D collided)
+    {
+        if(collided.gameObject.tag == "floor")
+        {
+            isGrounded = true;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collided)
+    {
+        if (collided.gameObject.tag == "floor")
+        {
+            isGrounded = false;
+        }
+    }
+
+    // Update is called once per frame
+    void Update () {
+
+        Debug.Log(isGrounded);
 
         //jump
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             body.AddForce(Vector2.up * 200f);
+            isGrounded = false;
         }
 
         //right
@@ -36,8 +61,15 @@ public class playerCtrl : MonoBehaviour {
                 transform.localRotation = Quaternion.Euler(0, 0, 0);
                 facingRight = true;
             }
-            transform.position += transform.right  * Time.deltaTime * speed;
-        }
+            if (isGrounded)
+            {
+                body.AddForce(Vector2.up * 50f);
+            }
+
+            transform.position += transform.right * Time.deltaTime * speed;
+        }  
+
+        //left
 
         if (Input.GetKey(KeyCode.A))
         {
@@ -45,6 +77,10 @@ public class playerCtrl : MonoBehaviour {
             {
                 transform.localRotation = Quaternion.Euler(0, 180, 0);
                 facingRight = false;
+            }
+            if (isGrounded)
+            {
+                body.AddForce(Vector2.up * 50f);
             }
             transform.position += transform.right * Time.deltaTime * speed;
         }
