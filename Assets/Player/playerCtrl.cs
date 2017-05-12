@@ -9,6 +9,9 @@ public class playerCtrl : MonoBehaviour {
     public Rigidbody2D body;
     public bool isGrounded;
     public float distToGround;
+    public static int currentXP;
+    public static int requiredXP;
+    public static int playerLevel; //static makes it belong to a class rather than object
     
 
 
@@ -19,6 +22,11 @@ public class playerCtrl : MonoBehaviour {
         body = GetComponent<Rigidbody2D>();
         facingRight = true;
         isGrounded = true;
+
+        //XP
+        currentXP = 0;
+        requiredXP = 100;
+        playerLevel = 1;
 	}
 
     //ground check
@@ -39,6 +47,13 @@ public class playerCtrl : MonoBehaviour {
         }
     }
 
+    private void levelUp()
+    {
+        playerLevel += 1;
+        currentXP = 0;
+        requiredXP += 50;
+    }
+
     // Update is called once per frame
     void Update () {
 
@@ -50,6 +65,17 @@ public class playerCtrl : MonoBehaviour {
         {
             body.AddForce(Vector2.up * 200f);
             isGrounded = false;
+        }
+
+        //add xp with up button
+
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            currentXP += 10;
+            if (currentXP > requiredXP || currentXP == requiredXP)
+            {
+                levelUp();
+            }
         }
 
         //right
