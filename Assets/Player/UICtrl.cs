@@ -5,6 +5,12 @@ using UnityEngine;
 public class UICtrl : MonoBehaviour {
 
     public GameObject player;
+    public GameObject levelUpObj;
+
+    private void Awake()
+    {
+        levelUpObj.SetActive(false);
+    }
 
     void OnGUI()
     {
