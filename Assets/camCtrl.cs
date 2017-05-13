@@ -10,10 +10,17 @@ public class camCtrl : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         offset = transform.position - player.transform.position;	
+
 	}
 	
 	// Update is called once per frame after all player actions
 	void LateUpdate () {
+
+        //move camera relative to player
+
         transform.position = player.transform.position + offset;
-	}
+        transform.Translate(Vector2.up * 5);
+   
+
+    }
 }
