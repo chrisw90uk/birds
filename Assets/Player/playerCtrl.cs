@@ -24,6 +24,15 @@ public class playerCtrl : MonoBehaviour {
     public GameObject bgLayer1;
     public GameObject bgLayer2;
 
+    //jump count
+
+    public static int jumpCount;
+    public static int totalJumps;
+
+    //moveables
+
+    RaycastHit2D hit;
+    int layerMask;
 
 
     // Use this for initialization
@@ -39,6 +48,14 @@ public class playerCtrl : MonoBehaviour {
         requiredXP = 100;
         playerLevel = 1;
         levelUpMsg = levelUpObj.GetComponent<Text>();
+
+        //jump count
+        totalJumps = 2;
+        jumpCount = 0;
+
+        //raycast
+        layerMask = ~(LayerMask.GetMask("Player"));
+
     }
 
     //ground check
@@ -48,6 +65,7 @@ public class playerCtrl : MonoBehaviour {
         if(collided.gameObject.tag == "floor")
         {
             isGrounded = true;
+            jumpCount = 0;
         }
 
         //collect pick up and increase XP
@@ -87,6 +105,7 @@ public class playerCtrl : MonoBehaviour {
     private void levelUp()
     {
         playerLevel += 1;
+        
         StartCoroutine(displayNewLevel()); //a coroutine isn't synchronised to the framerate
 
         if (currentXP > requiredXP)
@@ -98,18 +117,23 @@ public class playerCtrl : MonoBehaviour {
             currentXP = 0;
         }
         requiredXP += 50;
+        totalJumps += 1;
     }
 
 
     // Update is called once per frame
     void Update () {
 
-        Debug.Log(isGrounded);
-
         //jump
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
+            jumpCount += 1;
+            if(jumpCount > totalJumps)
+            {
+                return;
+            }
+            body.velocity = Vector2.zero;
             body.AddForce(Vector2.up * 200f);
             isGrounded = false;
         }
@@ -175,6 +199,16 @@ public class playerCtrl : MonoBehaviour {
             bgLayer1.transform.position += transform.right * Time.deltaTime * (speed / 4);
             bgLayer2.transform.position += transform.right * Time.deltaTime * (speed / 8);
         }
+        //pick up moveable objects
+
+        hit = Physics2D.Raycast(transform.position, transform.TransformDirection(Vector2.right), 1.2f, layerMask);
+
+        if (hit.collider != null)
+        {
+            Debug.DrawLine(transform.position, hit.point, Color.red);
+            Debug.Log(hit.collider);
+        }
+
     }
 
 }
