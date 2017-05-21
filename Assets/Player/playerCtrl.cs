@@ -33,6 +33,8 @@ public class playerCtrl : MonoBehaviour {
 
     RaycastHit2D hit;
     int layerMask;
+    public bool isHolding;
+    public GameObject pickUpObj;
 
 
     // Use this for initialization
@@ -55,6 +57,10 @@ public class playerCtrl : MonoBehaviour {
 
         //raycast
         layerMask = ~(LayerMask.GetMask("Player"));
+
+        //moveables
+
+        isHolding = false;
 
     }
 
@@ -207,6 +213,10 @@ public class playerCtrl : MonoBehaviour {
         {
             Debug.DrawLine(transform.position, hit.point, Color.red);
             Debug.Log(hit.collider);
+            if (hit.collider.tag == "moveable")
+            {
+
+            }
         }
 
     }
