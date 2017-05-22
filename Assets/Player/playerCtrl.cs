@@ -34,7 +34,9 @@ public class playerCtrl : MonoBehaviour {
     RaycastHit2D hit;
     int layerMask;
     public bool isHolding;
+    private GameObject activePickup;
     public GameObject pickUpObj;
+    public GameObject pickedUpObj;
 
 
     // Use this for initialization
@@ -61,6 +63,8 @@ public class playerCtrl : MonoBehaviour {
         //moveables
 
         isHolding = false;
+        activePickup = null;
+        pickedUpObj = null;
 
     }
 
@@ -127,15 +131,18 @@ public class playerCtrl : MonoBehaviour {
     }
 
 
+
+
     // Update is called once per frame
-    void Update () {
+    void Update()
+    {
 
         //jump
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
             jumpCount += 1;
-            if(jumpCount > totalJumps)
+            if (jumpCount > totalJumps)
             {
                 return;
             }
@@ -172,7 +179,7 @@ public class playerCtrl : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.D))
         {
-            if (facingRight!=true)
+            if (facingRight != true)
             {
                 transform.localRotation = Quaternion.Euler(0, 0, 0);
                 facingRight = true;
@@ -186,7 +193,7 @@ public class playerCtrl : MonoBehaviour {
             transform.position += transform.right * Time.deltaTime * speed;
             bgLayer1.transform.position += transform.right * Time.deltaTime * (speed / 4);
             bgLayer2.transform.position += transform.right * Time.deltaTime * (speed / 8);
-        }  
+        }
 
         //left
 
@@ -211,14 +218,61 @@ public class playerCtrl : MonoBehaviour {
 
         if (hit.collider != null)
         {
-            Debug.DrawLine(transform.position, hit.point, Color.red);
-            Debug.Log(hit.collider);
+            activePickup = null;
+
             if (hit.collider.tag == "moveable")
             {
-
+                activePickup = hit.collider.GetComponent<stickCtrl>().StickTip;
+                activePickup.SetActive(true);
+            }
+            else
+            {
+                if (activePickup != null)
+                {
+                    activePickup.SetActive(false);
+                    activePickup = null;
+                }
+                else
+                {
+                    activePickup = null;
+                }
+            }
+        }
+        else
+        {
+            if (activePickup != null)
+            {
+                activePickup.SetActive(false);
+                activePickup = null;
+            }
+            else
+            {
+                activePickup = null;
             }
         }
 
+        if (pickedUpObj != null)
+        {
+            pickedUpObj.transform.position = transform.position;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (pickedUpObj == null)
+            {
+                pickedUpObj = hit.collider.gameObject;
+                pickedUpObj.GetComponent<Rigidbody2D>().isKinematic = true;
+                pickedUpObj.GetComponent<Collider2D>().enabled = false;
+                activePickup.SetActive(false);
+                isHolding = true;
+            }
+            else if(isHolding == true)
+            {
+                pickedUpObj.GetComponent<Rigidbody2D>().isKinematic = false;
+                pickedUpObj.GetComponent<Collider2D>().enabled = true;
+                pickedUpObj = null;
+            }
+        }
     }
 
 }
